@@ -2,7 +2,11 @@
 // Distributed under the MIT License, see LICENSE file.
 
 import core.stdc.stdlib : exit;
-import std;
+import std.file : SpanMode, dirEntries, getcwd, exists, isDir;
+import std.format : format;
+import std.path : baseName, buildPath;
+import std.process : spawnShell, wait;
+import std.stdio : writeln;
 
 /// Gets the entries of the given directory path.
 auto getEntries(string path) {
@@ -12,7 +16,8 @@ auto getEntries(string path) {
 /// Returns true if the given directory path has a dub package.
 bool isDubPackage(string path) {
     foreach (entry; getEntries(path)) {
-        if (baseName(entry) == "dub.json") return true;
+        if (baseName(entry) == "dub.json")
+            return true;
     }
     return false;
 }
@@ -25,19 +30,31 @@ bool hasExamples(string path) {
 
 /// Runs a command and exits if something failed.
 void run(string cmd) {
-    if (wait(spawnShell(cmd)) != 0) exit(1);
+    if (wait(spawnShell(cmd)) == 0) {
+        writeln(format("[INFO] success: %s", cmd));
+    } else {
+        writeln(format("[INFO] failure: %s", cmd));
+        exit(1);
+    }
+}
+
+/// Runs a DUB command and exits if something failed.
+void runDubCmd(string path, string cmd) {
+    run(format("dub --root=%s %s", path, cmd));
 }
 
 /// Runs the tests of the given dub package.
 void runTests(string path) {
-    run(format("dub --root=%s test", path));
+    runDubCmd(path, "test");
 }
 
 /// Runs the examples of the given dub package.
 void runExamples(string path) {
-    foreach (entry; getEntries(buildPath(path, "examples"))) {
-        run(format("dub --root=%s build", entry));
-        run(format(buildPath(entry, baseName(entry))));
+    if (hasExamples(path)) {
+        foreach (entry; getEntries(buildPath(path, "examples"))) {
+            if (isDubPackage(entry))
+                runDubCmd(entry, "run");
+        }
     }
 }
 
@@ -45,7 +62,7 @@ void main(string[] args) {
     auto dir = (args.length > 1) ? args[1] : getcwd();
     if (isDubPackage(dir)) {
         runTests(dir);
-        if (hasExamples(dir)) runExamples(dir);
+        runExamples(dir);
     } else {
         writeln(format("Path '%s' is not a dub package.", dir));
     }
