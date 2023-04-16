@@ -1,19 +1,18 @@
 # Dubnium
 
-A helper program for DUB packages.
-It currently only runs all the available tests and examples of a package.
+An example runner for DUB packages.
+It runs all the available examples of a package.
 
 ## Usage
 
 The examples of a package should be in a directory named 'examples'
 and each example should be its own DUB package.
-To test the package in the current directory, run the following command:
+To run the examples in the current directory, run the following command:
 
 ```sh
 dubnium
 ```
-
-To test a package in another directory, run the following command:
+To run the examples in another directory, run the following command:
 
 ```sh
 dubnium my/cute/package

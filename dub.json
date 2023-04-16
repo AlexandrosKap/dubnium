@@ -3,7 +3,7 @@
         "Alexandros Filippos Giounior Kapretsos"
     ],
     "copyright": "Copyright © 2023, Alexandros Filippos Giounior Kapretsos",
-    "description": "A helper program for DUB packages.",
+    "description": "An example runner for DUB packages.",
     "license": "MIT",
     "name": "dubnium"
 }
