@@ -30,7 +30,7 @@ That's it... Or is it?
 Clone the repo and run the following command:
 
 ```sh
-dmd -release source/dubnium.d
+dub build -b release
 ```
 
 That's it.

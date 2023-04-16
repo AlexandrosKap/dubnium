@@ -1,8 +1,10 @@
 // Copyright (c) 2023 Alexandros Filippos Giounior Kapretsos
 // Distributed under the MIT License, see LICENSE file.
 
+module dubnium;
+
 import core.stdc.stdlib : exit;
-import std.file : SpanMode, dirEntries, getcwd, exists, isDir;
+import std.file : SpanMode, dirEntries, exists, isDir;
 import std.format : format;
 import std.path : baseName, buildPath;
 import std.process : spawnShell, wait;
@@ -16,8 +18,9 @@ auto getEntries(string path) {
 /// Returns true if the given directory path has a dub package.
 bool isDubPackage(string path) {
     foreach (entry; getEntries(path)) {
-        if (baseName(entry) == "dub.json")
+        if (baseName(entry) == "dub.json") {
             return true;
+        }
     }
     return false;
 }
@@ -52,18 +55,9 @@ void runTests(string path) {
 void runExamples(string path) {
     if (hasExamples(path)) {
         foreach (entry; getEntries(buildPath(path, "examples"))) {
-            if (isDubPackage(entry))
+            if (isDubPackage(entry)) {
                 runDubCmd(entry, "run");
+            }
         }
-    }
-}
-
-void main(string[] args) {
-    auto dir = (args.length > 1) ? args[1] : getcwd();
-    if (isDubPackage(dir)) {
-        runTests(dir);
-        runExamples(dir);
-    } else {
-        writeln(format("Path '%s' is not a dub package.", dir));
     }
 }
